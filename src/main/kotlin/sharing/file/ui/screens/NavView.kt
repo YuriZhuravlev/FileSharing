@@ -22,12 +22,17 @@ import androidx.compose.ui.unit.dp
 import sharing.file.ui.navigation.Navigation
 import sharing.file.ui.screens.about.AboutScreen
 import sharing.file.ui.screens.about.AboutViewModel
+import sharing.file.ui.screens.edit.EditDocumentView
+import sharing.file.ui.screens.edit.EditDocumentViewModel
+import sharing.file.ui.screens.login.LoginView
+import sharing.file.ui.screens.login.LoginViewModel
 import sharing.file.ui.screens.main.MainScreen
 import sharing.file.ui.screens.main.MainViewModel
+import sharing.file.ui.screens.splash.SplashView
 
 @Composable
 fun NavView() {
-    var state by mutableStateOf(Navigation.Main)
+    var state by mutableStateOf(Navigation.Splash)
     Scaffold(topBar = {
         TopAppBar {
             Icon(
@@ -69,6 +74,13 @@ fun NavView() {
                 }
                 Navigation.About -> {
                     AboutScreen(AboutViewModel())
+                }
+                Navigation.Splash -> SplashView()
+                Navigation.Login -> {
+                    LoginView(LoginViewModel())
+                }
+                Navigation.EditDocument -> {
+                    EditDocumentView(EditDocumentViewModel())
                 }
             }
         }

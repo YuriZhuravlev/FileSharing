@@ -4,7 +4,7 @@ enum class Navigation {
     /**
      * Начальное состояние (пользователь не авторизован)
      */
-    Login,
+    Splash,
 
     /**
      * О программе
@@ -14,7 +14,7 @@ enum class Navigation {
     /**
      * Ввод имени пользователя
      */
-    SelectUser,
+    Login,
 
     /**
      * Основное меню
@@ -24,10 +24,5 @@ enum class Navigation {
     /**
      * Изменение документа
      */
-    EditDocument,
-
-    /**
-     * Чтение документа
-     */
-    ViewDocument
+    EditDocument
 }
