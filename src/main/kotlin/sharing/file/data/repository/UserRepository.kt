@@ -11,12 +11,13 @@ import sharing.file.data.model.User
 object UserRepository {
     private val _user = MutableStateFlow<Resource<User?>>(Resource.SuccessResource(null))
     val user = _user.asStateFlow()
+    val keyManager = KeyManager
 
     suspend fun login(name: String) {
         _user.emit(Resource.LoadingResource())
         val result = withContext(Dispatchers.IO) {
             try {
-                Resource.SuccessResource<User?>(KeyManager.getUser(name))
+                Resource.SuccessResource<User?>(keyManager.getUser(name))
             } catch (e: Exception) {
                 Resource.FailedResource(e)
             }
@@ -33,7 +34,7 @@ object UserRepository {
         _user.emit(Resource.LoadingResource(_user.value.data))
         withContext(Dispatchers.IO) {
             try {
-                Resource.SuccessResource(KeyManager.deletePair(name))
+                Resource.SuccessResource(keyManager.deletePair(name))
                 _user.emit(Resource.SuccessResource(null))
             } catch (e: Exception) {
                 _user.emit(Resource.FailedResource(e, _user.value.data))
