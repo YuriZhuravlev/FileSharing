@@ -1,9 +1,43 @@
 package sharing.file.ui.screens.login
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.TextField
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import sharing.file.data.Resource
+import sharing.file.ui.view.BigText
 
 @Composable
-fun LoginView(viewModel: LoginViewModel) {
-    Text("Login")
+fun LoginView(viewModel: LoginViewModel, onSuccess: () -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        val user by viewModel.user.collectAsState()
+        var name by remember { mutableStateOf("") }
+        if (user.data != null) {
+            onSuccess()
+        }
+        BigText(
+            "Введите имя",
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp)
+        )
+        TextField(
+            value = name, onValueChange = { name = it },
+            enabled = user.status != Resource.Status.Loading,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            singleLine = true, isError = user.status == Resource.Status.Failed
+        )
+        Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
+            viewModel.login(name)
+        }, enabled = name.isNotBlank() && user.status != Resource.Status.Loading) {
+            Text("Войти")
+        }
+        if (user.status == Resource.Status.Loading)
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+    }
 }

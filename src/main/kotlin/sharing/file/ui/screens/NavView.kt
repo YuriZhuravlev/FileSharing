@@ -92,7 +92,9 @@ fun NavView() {
                 }
                 Navigation.Splash -> SplashView()
                 Navigation.Login -> {
-                    LoginView(LoginViewModel())
+                    LoginView(LoginViewModel()) {
+                        state = Navigation.Main
+                    }
                 }
                 Navigation.EditDocument -> {
                     EditDocumentView(EditDocumentViewModel())
