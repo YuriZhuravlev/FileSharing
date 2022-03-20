@@ -44,7 +44,7 @@ object DocumentRepository {
     }
 
 
-    suspend fun write(document: Document, path: String) {
+    private suspend fun write(document: Document, path: String) {
         withContext(Dispatchers.IO) {
             DataOutputStream(FileOutputStream(path)).run {
                 val name = document.name.toByteArray()
