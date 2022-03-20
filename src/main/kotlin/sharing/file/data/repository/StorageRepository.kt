@@ -8,7 +8,7 @@ import sharing.file.data.model.OpenKey
 import sharing.file.data.model.SignedOpenKey
 
 object StorageRepository {
-    suspend fun ExportKey(path: String): Resource<Any> {
+    suspend fun exportKey(path: String): Resource<Any> {
         return withContext(Dispatchers.IO) {
             try {
                 val user = UserRepository.user.value.data!!
@@ -22,7 +22,7 @@ object StorageRepository {
         }
     }
 
-    suspend fun ImportKey(path: String): Resource<Any> {
+    suspend fun importKey(path: String): Resource<Any> {
         return withContext(Dispatchers.IO) {
             try {
                 OpenKey.read(path).run {

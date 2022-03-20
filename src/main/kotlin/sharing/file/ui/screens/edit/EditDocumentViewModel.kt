@@ -1,4 +1,6 @@
 package sharing.file.ui.screens.edit
 
-class EditDocumentViewModel {
+import sharing.file.base.ViewModel
+
+class EditDocumentViewModel(path: String) : ViewModel() {
 }

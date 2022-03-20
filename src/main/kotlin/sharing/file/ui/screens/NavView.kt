@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -16,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import sharing.file.data.model.Document
 import sharing.file.data.repository.UserRepository
 import sharing.file.ui.navigation.Navigation
 import sharing.file.ui.screens.about.AboutScreen
@@ -31,7 +31,7 @@ import sharing.file.ui.screens.splash.SplashView
 @Composable
 fun NavView() {
     var state by remember { mutableStateOf(Navigation.Splash) }
-    var document by remember { mutableStateOf<Document?>(null) }
+    var documentPath by remember { mutableStateOf<String?>(null) }
     val user by UserRepository.user.collectAsState()
     if (user.data == null && state == Navigation.Main)
         state = Navigation.Splash
@@ -81,7 +81,11 @@ fun NavView() {
                     )
                     Text("Войти", modifier = Modifier.align(Alignment.CenterVertically))
                 } else {
-                    Text(userItem.name, modifier = Modifier.align(Alignment.CenterVertically))
+                    Text(
+                        userItem.name, modifier = Modifier.height(24.dp)
+                            .align(Alignment.CenterVertically)
+                            .padding(horizontal = 8.dp)
+                    )
                 }
             }
         }
@@ -90,7 +94,7 @@ fun NavView() {
             when (state) {
                 Navigation.Main -> {
                     MainScreen(MainViewModel()) {
-                        document = it
+                        documentPath = it
                         state = Navigation.EditDocument
                     }
                 }
@@ -104,7 +108,11 @@ fun NavView() {
                     }
                 }
                 Navigation.EditDocument -> {
-                    EditDocumentView(EditDocumentViewModel())
+                    val doc = documentPath
+                    if (doc != null)
+                        EditDocumentView(EditDocumentViewModel(doc))
+                    else
+                        state = Navigation.Main
                 }
             }
         }

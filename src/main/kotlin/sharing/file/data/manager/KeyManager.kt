@@ -26,6 +26,7 @@ object KeyManager {
 
         suspend fun getUser(name: String): User {
             val input = load()
+            println("length: ${input.available()}")
             val nameLen = name.toByteArray().size
             val privateKey: ByteArray
             val publicKey: ByteArray
@@ -63,6 +64,7 @@ object KeyManager {
 
         suspend fun deleteUser(name: String): Boolean {
             val input = load()
+            println("length: ${input.available()}")
             val out = open(false)
             val nameLen = name.toByteArray().size
             var find = false
@@ -71,12 +73,13 @@ object KeyManager {
                 val privateLen = input.readInt()
                 val publicLen = input.readInt()
                 if (nameLen == currentNameLen) {
-                    val currentName = String(input.readNBytes(nameLen))
+                    val nameBytes = input.readNBytes(nameLen)
+                    val currentName = String(nameBytes)
                     if (name != currentName) {
                         out.writeInt(currentNameLen)
                         out.writeInt(privateLen)
                         out.writeInt(publicLen)
-                        out.write(currentName.toByteArray())
+                        out.write(nameBytes)
                         out.write(input.readNBytes(privateLen + publicLen))
                     } else {
                         // удаляемая запись
@@ -85,6 +88,9 @@ object KeyManager {
                         find = true
                     }
                 } else {
+                    out.writeInt(currentNameLen)
+                    out.writeInt(privateLen)
+                    out.writeInt(publicLen)
                     out.write(input.readNBytes(currentNameLen + privateLen + publicLen))
                 }
             }
