@@ -2,10 +2,7 @@ package sharing.file.data.model
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.io.*
 
 class OpenKey(
     /**
@@ -27,11 +24,17 @@ class OpenKey(
 ) {
     suspend fun write(path: String) {
         withContext(Dispatchers.IO) {
+            val file = File(path)
+            if (!file.exists()) {
+                file.parentFile.mkdirs()
+                file.createNewFile()
+            }
             DataOutputStream(FileOutputStream(path)).run {
                 writeInt(nameLen)
                 writeInt(blobLen)
                 write(name)
                 write(blob)
+                close()
             }
         }
     }

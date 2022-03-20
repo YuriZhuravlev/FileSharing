@@ -5,16 +5,21 @@ import kotlinx.coroutines.withContext
 import sharing.file.data.Resource
 import sharing.file.data.manager.CryptoManager
 import sharing.file.data.model.Document
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.io.*
 
 object DocumentRepository {
     suspend fun openDocument(path: String): Resource<Document> {
         return try {
-            Resource.SuccessResource(read(path))
+            Resource.SuccessResource(read(path).apply {
+                val signed = StorageRepository.getSignedOpenKey(name).data
+                verify = signed != null && CryptoManager.sign(
+                    publicKeyEncoded = signed.blob,
+                    data = (name + text).toByteArray(),
+                    digitalSignature = sign
+                )
+            })
         } catch (e: Exception) {
+            e.printStackTrace()
             Resource.FailedResource(e)
         }
     }
@@ -46,6 +51,11 @@ object DocumentRepository {
 
     private suspend fun write(document: Document, path: String) {
         withContext(Dispatchers.IO) {
+            val file = File(path)
+            if (!file.exists()) {
+                file.parentFile.mkdirs()
+                file.createNewFile()
+            }
             DataOutputStream(FileOutputStream(path)).run {
                 val name = document.name.toByteArray()
                 val sign = CryptoManager.createSignature(

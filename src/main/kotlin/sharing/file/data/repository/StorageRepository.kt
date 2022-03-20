@@ -17,6 +17,7 @@ object StorageRepository {
                 openKey.write(path)
                 Resource.SuccessResource(Any())
             } catch (e: Exception) {
+                e.printStackTrace()
                 Resource.FailedResource(e)
             }
         }
@@ -25,6 +26,7 @@ object StorageRepository {
     suspend fun importKey(path: String): Resource<Any> {
         return withContext(Dispatchers.IO) {
             try {
+                val user = UserRepository.user.value.data!!
                 OpenKey.read(path).run {
                     val signedOpenKey = SignedOpenKey(
                         nameLen = nameLen,
@@ -33,12 +35,28 @@ object StorageRepository {
                         blob = blob,
                         sign = CryptoManager.createSignature(
                             data = name + blob,
-                            UserRepository.user.value.data!!.privateKey
+                            user.privateKey
                         )
                     )
+                    signedOpenKey.write("PK/${user.name}/${String(signedOpenKey.name)}.${SignedOpenKey.type}")
                 }
                 Resource.SuccessResource(Any())
             } catch (e: Exception) {
+                e.printStackTrace()
+                Resource.FailedResource(e)
+            }
+        }
+    }
+
+    suspend fun getSignedOpenKey(name: String): Resource<SignedOpenKey> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val user = UserRepository.user.value.data!!
+                Resource.SuccessResource(
+                    SignedOpenKey.read("PK/${user.name}/${name}.${SignedOpenKey.type}")
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
                 Resource.FailedResource(e)
             }
         }

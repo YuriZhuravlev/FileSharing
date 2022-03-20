@@ -22,6 +22,8 @@ class Document(
      */
     val text: String
 ) {
+    var verify: Boolean? = null
+
     companion object {
         const val type = "sd"
     }
