@@ -24,6 +24,23 @@ object DocumentRepository {
         }
     }
 
+
+    suspend fun saveDocument(text: String, path: String): Resource<Any> {
+        return try {
+            val user = UserRepository.user.value.data!!
+            val document = Document(
+                0,
+                0,
+                user.name,
+                ByteArray(0),
+                text
+            )
+            Resource.SuccessResource(write(document, path))
+        } catch (e: Exception) {
+            Resource.FailedResource(e)
+        }
+    }
+
     suspend fun saveDocument(document: Document, path: String): Resource<Any> {
         return try {
             Resource.SuccessResource(write(document, path))

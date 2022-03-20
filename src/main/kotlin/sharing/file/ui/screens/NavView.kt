@@ -108,11 +108,7 @@ fun NavView() {
                     }
                 }
                 Navigation.EditDocument -> {
-                    val doc = documentPath
-                    if (doc != null)
-                        EditDocumentView(EditDocumentViewModel(doc))
-                    else
-                        state = Navigation.Main
+                    EditDocumentView(EditDocumentViewModel(documentPath))
                 }
             }
         }
