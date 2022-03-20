@@ -10,6 +10,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import sharing.file.data.Resource
 import sharing.file.ui.view.BigText
@@ -39,5 +40,7 @@ fun LoginView(viewModel: LoginViewModel, onSuccess: () -> Unit) {
         }
         if (user.status == Resource.Status.Loading)
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        if (user.status == Resource.Status.Failed)
+            Text(user.error?.message ?: "Произошла ошибка", color = Color.Red)
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import sharing.file.data.model.Document
 import sharing.file.data.repository.UserRepository
 import sharing.file.ui.navigation.Navigation
 import sharing.file.ui.screens.about.AboutScreen
@@ -29,8 +30,11 @@ import sharing.file.ui.screens.splash.SplashView
 
 @Composable
 fun NavView() {
-    var state by mutableStateOf(Navigation.Splash)
+    var state by remember { mutableStateOf(Navigation.Splash) }
+    var document by remember { mutableStateOf<Document?>(null) }
     val user by UserRepository.user.collectAsState()
+    if (user.data == null && state == Navigation.Main)
+        state = Navigation.Splash
     Scaffold(topBar = {
         TopAppBar {
             if (!(state == Navigation.Splash || state == Navigation.Main)) {
@@ -85,7 +89,10 @@ fun NavView() {
         Box(modifier = Modifier.padding(it)) {
             when (state) {
                 Navigation.Main -> {
-                    MainScreen(MainViewModel())
+                    MainScreen(MainViewModel()) {
+                        document = it
+                        state = Navigation.EditDocument
+                    }
                 }
                 Navigation.About -> {
                     AboutScreen()

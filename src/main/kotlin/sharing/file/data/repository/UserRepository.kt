@@ -19,10 +19,10 @@ object UserRepository {
             try {
                 Resource.SuccessResource<User?>(keyManager.getUser(name))
             } catch (e: Exception) {
+                e.printStackTrace()
                 Resource.FailedResource(e)
             }
         }
-        println("${result.status} login ${result.data?.name ?: result.error?.message}")
         _user.emit(result)
     }
 
@@ -30,15 +30,16 @@ object UserRepository {
         _user.emit(Resource.SuccessResource(null))
     }
 
-    suspend fun deleteKeys(name: String) {
+    suspend fun deleteKeys() {
         _user.emit(Resource.LoadingResource(_user.value.data))
         withContext(Dispatchers.IO) {
             try {
+                val name = _user.value.data!!.name
                 Resource.SuccessResource(keyManager.deletePair(name))
                 _user.emit(Resource.SuccessResource(null))
             } catch (e: Exception) {
                 _user.emit(Resource.FailedResource(e, _user.value.data))
-                println("Failed deleteKeys ${e.message}")
+                e.printStackTrace()
             }
         }
     }
