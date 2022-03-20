@@ -26,7 +26,6 @@ object KeyManager {
 
         suspend fun getUser(name: String): User {
             val input = load()
-            println("length: ${input.available()}")
             val nameLen = name.toByteArray().size
             val privateKey: ByteArray
             val publicKey: ByteArray
@@ -64,7 +63,6 @@ object KeyManager {
 
         suspend fun deleteUser(name: String): Boolean {
             val input = load()
-            println("length: ${input.available()}")
             val out = open(false)
             val nameLen = name.toByteArray().size
             var find = false

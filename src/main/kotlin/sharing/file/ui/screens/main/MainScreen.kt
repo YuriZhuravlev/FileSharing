@@ -100,8 +100,7 @@ fun SaveFile(
         object : FileDialog(parent, "Выберите место для экспорта", SAVE) {
             override fun setVisible(value: Boolean) {
                 super.setVisible(value)
-                println("$value - ${directory + file}")
-                if (value) {
+                if (!value && directory != null && file != null) {
                     onCloseRequest(directory + file)
                 }
             }
@@ -113,7 +112,7 @@ fun SaveFile(
             }
         }
     },
-    dispose = FileDialog::dispose
+    dispose = { }
 )
 
 @Composable
@@ -126,8 +125,7 @@ fun SelectFile(
         object : FileDialog(parent, "Выберите файл", LOAD) {
             override fun setVisible(value: Boolean) {
                 super.setVisible(value)
-                println("$value - ${directory + file}")
-                if (value) {
+                if (!value && directory != null && file != null) {
                     onCloseRequest(directory + file)
                 }
             }
@@ -136,5 +134,5 @@ fun SelectFile(
             file = "*.${type}"
         }
     },
-    dispose = FileDialog::dispose
+    dispose = { }
 )
