@@ -10,8 +10,8 @@ import sharing.file.data.model.User
 
 object UserRepository {
     private val _user = MutableStateFlow<Resource<User?>>(Resource.SuccessResource(null))
+    private val keyManager = KeyManager
     val user = _user.asStateFlow()
-    val keyManager = KeyManager
 
     suspend fun login(name: String) {
         _user.emit(Resource.LoadingResource())
