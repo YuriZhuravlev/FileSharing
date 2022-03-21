@@ -99,7 +99,7 @@ object KeyManager {
 
         private fun load(): DataInputStream {
             if (!File(path).exists()) File(path).createNewFile()
-            return DataInputStream(ByteArrayInputStream(FileInputStream(path).readAllBytes()))
+            return DataInputStream(ByteArrayInputStream(FileInputStream(path).readNBytes(Int.MAX_VALUE)))
         }
 
         private fun open(append: Boolean = true): DataOutputStream {

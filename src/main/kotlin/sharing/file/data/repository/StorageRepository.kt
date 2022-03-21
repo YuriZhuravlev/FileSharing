@@ -52,9 +52,18 @@ object StorageRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val user = UserRepository.user.value.data!!
-                Resource.SuccessResource(
-                    SignedOpenKey.read("PK/${user.name}/${name}.${SignedOpenKey.type}")
+                val signedOpenKey = SignedOpenKey.read("PK/${user.name}/${name}.${SignedOpenKey.type}")
+                if (CryptoManager.sign(
+                        user.publicKey,
+                        data = signedOpenKey.name + signedOpenKey.blob,
+                        signedOpenKey.sign
+                    )
                 )
+                    Resource.SuccessResource(
+                        signedOpenKey
+                    ) else
+                // TODO
+                    Resource.FailedResource(Throwable("Error"))
             } catch (e: Exception) {
                 e.printStackTrace()
                 Resource.FailedResource(e)
