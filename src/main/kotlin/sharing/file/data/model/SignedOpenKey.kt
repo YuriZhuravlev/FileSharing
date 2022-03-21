@@ -53,7 +53,7 @@ class SignedOpenKey(
                     SignedOpenKey(
                         nameLen,
                         blobLen,
-                        name = readNBytes(nameLen).apply { println(String(this)) },
+                        name = readNBytes(nameLen),
                         blob = readNBytes(blobLen),
                         sign = readNBytes(available())
                     )
