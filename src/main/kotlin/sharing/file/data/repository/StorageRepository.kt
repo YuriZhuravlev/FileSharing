@@ -5,6 +5,8 @@ import kotlinx.coroutines.withContext
 import sharing.file.data.Resource
 import sharing.file.data.manager.CryptoManager
 import sharing.file.data.model.OpenKey
+import sharing.file.data.model.OpenKeyFailedSigned
+import sharing.file.data.model.OpenKeyNotFound
 import sharing.file.data.model.SignedOpenKey
 
 object StorageRepository {
@@ -52,18 +54,21 @@ object StorageRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val user = UserRepository.user.value.data!!
-                val signedOpenKey = SignedOpenKey.read("PK/${user.name}/${name}.${SignedOpenKey.type}")
+                val signedOpenKey = try {
+                    SignedOpenKey.read("PK/${user.name}/${name}.${SignedOpenKey.type}")
+                } catch (e: Exception) {
+                    throw OpenKeyNotFound()
+                }
                 if (CryptoManager.sign(
                         user.publicKey,
                         data = signedOpenKey.name + signedOpenKey.blob,
                         signedOpenKey.sign
                     )
-                )
-                    Resource.SuccessResource(
-                        signedOpenKey
-                    ) else
-                // TODO
-                    Resource.FailedResource(Throwable("Error"))
+                ) {
+                    Resource.SuccessResource(signedOpenKey)
+                } else {
+                    throw OpenKeyFailedSigned()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Resource.FailedResource(e)

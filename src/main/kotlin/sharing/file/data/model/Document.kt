@@ -22,7 +22,11 @@ class Document(
      */
     val text: String
 ) {
-    var verify: Boolean? = null
+    var verify: Verify = Verify.Empty
+
+    enum class Verify {
+        NotFoundOpenKey, FailedSignedOpenKey, FailedSigned, Success, Empty
+    }
 
     companion object {
         const val type = "sd"

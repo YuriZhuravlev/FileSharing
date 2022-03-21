@@ -42,7 +42,7 @@ class EditDocumentViewModel(path: String?) : ViewModel() {
                 ByteArray(0),
                 text = ""
             ).apply {
-                verify = true
+                verify = Document.Verify.Empty
             }
         )
     }

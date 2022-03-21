@@ -4,19 +4,35 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import sharing.file.data.Resource
 import sharing.file.data.manager.CryptoManager
-import sharing.file.data.model.Document
+import sharing.file.data.model.*
 import java.io.*
 
 object DocumentRepository {
+    // Если документ с заданным именем не найден,
+    // отсутствует открытый ключ автора документа (он не был предварительно импортирован),
+    // не подтверждаются подписи под открытым ключом
+    // или  документом,
+    // приложение должно выводить соответствующие сообщения
     suspend fun openDocument(path: String): Resource<Document> {
         return try {
             Resource.SuccessResource(read(path).apply {
-                val signed = StorageRepository.getSignedOpenKey(name).data
-                verify = signed != null && CryptoManager.sign(
-                    publicKeyEncoded = signed.blob,
-                    data = (name + text).toByteArray(),
-                    digitalSignature = sign
-                )
+                val signedOpenKey = StorageRepository.getSignedOpenKey(name)
+                val signed = signedOpenKey.data
+                verify = when {
+                    (signedOpenKey.error is OpenKeyNotFound) -> Document.Verify.NotFoundOpenKey
+                    (signedOpenKey.error is OpenKeyFailedSigned) -> Document.Verify.FailedSignedOpenKey
+                    else -> {
+                        if (signed != null && CryptoManager.sign(
+                                publicKeyEncoded = signed.blob,
+                                data = (name + text).toByteArray(),
+                                digitalSignature = sign
+                            )
+                        )
+                            Document.Verify.Success
+                        else
+                            Document.Verify.FailedSigned
+                    }
+                }
             })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -51,16 +67,23 @@ object DocumentRepository {
 
     private suspend fun read(path: String): Document {
         return withContext(Dispatchers.IO) {
-            DataInputStream(FileInputStream(path)).run {
-                val nameLen = readInt()
-                val signLen = readInt()
-                Document(
-                    nameLen = nameLen,
-                    signLen = signLen,
-                    name = String(readNBytes(nameLen)),
-                    sign = readNBytes(signLen),
-                    text = readUTF()
-                )
+            val file = File(path)
+            if (!file.exists())
+                throw DocumentNotFound(path)
+            try {
+                DataInputStream(FileInputStream(file)).run {
+                    val nameLen = readInt()
+                    val signLen = readInt()
+                    Document(
+                        nameLen = nameLen,
+                        signLen = signLen,
+                        name = String(readNBytes(nameLen)),
+                        sign = readNBytes(signLen),
+                        text = readUTF()
+                    )
+                }
+            } catch (e: Exception) {
+                throw DocumentFailed()
             }
         }
     }

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import sharing.file.data.Resource
 import sharing.file.data.model.Document
 import sharing.file.ui.screens.main.SaveFile
+import sharing.file.ui.view.BigText
 
 @Composable
 fun EditDocumentView(viewModel: EditDocumentViewModel) {
@@ -37,10 +38,17 @@ fun EditDocumentView(viewModel: EditDocumentViewModel) {
                 Column(modifier = Modifier.width(160.dp).padding(8.dp)) {
                     Text("Владелец", fontSize = 12.sp)
                     OutlinedTextField(doc.name, {}, readOnly = true)
-                    if (doc.verify != true) {
-                        Text("Подпись не подтверждена", modifier = Modifier.align(Alignment.End), color = Color.Red)
-                        Text("(нужна конкретизация)")
-                    }
+                    Text(
+                        when (doc.verify) {
+                            Document.Verify.FailedSigned -> "Подпись документа не подтверждена"
+                            Document.Verify.NotFoundOpenKey -> "Отсутствует открытый ключ автора документа"
+                            Document.Verify.FailedSignedOpenKey -> "Подпись открытого ключа не подтверждена"
+                            Document.Verify.Success -> "Подписанный документ"
+                            else -> ""
+                        },
+                        modifier = Modifier.align(Alignment.End),
+                        color = if (doc.verify != Document.Verify.Success) Color.Red else Color.Black
+                    )
                     Box(Modifier.weight(1f))
                     if (result.status == Resource.Status.Loading)
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -61,7 +69,7 @@ fun EditDocumentView(viewModel: EditDocumentViewModel) {
                     text = it
                 }, modifier = Modifier.weight(1f).fillMaxHeight().padding(8.dp))
             } else {
-                Text("Error :(")
+                BigText(document.error?.message ?: "Error :(", Modifier.padding(16.dp))
             }
         }
     }
