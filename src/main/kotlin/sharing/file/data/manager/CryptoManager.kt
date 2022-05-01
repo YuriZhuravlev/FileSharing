@@ -1,7 +1,6 @@
 package sharing.file.data.manager
 
 import java.security.KeyFactory
-import java.security.MessageDigest
 import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
@@ -11,10 +10,6 @@ object CryptoManager {
     // RSA - Алгоритм подписи документа
     // SHA1 - Алгоритм хеширования открытого ключа
     // RSA - Алгоритм подписи открытого ключа
-
-    fun sha1(text: String): ByteArray {
-        return MessageDigest.getInstance("SHA-1").digest(text.toByteArray())
-    }
 
     fun createSignature(
         data: ByteArray,
